@@ -3,12 +3,8 @@
     <a class="navbar-brand" href="#">Auth İşlemleri</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item" tag="li">
-          <a class="nav-link" href="#">Anasayfa</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Hakkımda</a>
-        </li>
+        <router-link tag="li" class="nav-item" to="/"><a class="nav-link">Homepage</a></router-link>
+        <router-link tag="li" class="nav-item" to="/about"><a class="nav-link">About</a></router-link>
       </ul>
       <ul class="navbar-nav my-2 my-lg-0" :class="logoutClass">
         <li class="nav-item">
@@ -22,12 +18,13 @@
 export default {
   methods: {
     logout() {
+      this.$store.dispatch('logout');
     }
   },
   computed: {
     logoutClass() {
       return {
-        'd-none': false
+        'd-none': !this.$store.getters.isAuthenticated
       }
     }
   }

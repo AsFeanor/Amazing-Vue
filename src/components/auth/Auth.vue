@@ -38,6 +38,7 @@
 </template>
 
 <script>
+
 export default {
   name: "Auth",
   data() {
@@ -52,7 +53,10 @@ export default {
   },
   methods: {
     onSubmit() {
-      alert(this.user)
+      this.$store.dispatch("login", { ...this.user, isUser: this.isUser })
+      .then(response => {
+        this.$router.push("/")
+      })
     }
   }
 }
