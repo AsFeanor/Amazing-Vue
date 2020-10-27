@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Auth from "@/components/auth/Auth";
 import store from '../store'
+import ForumPost from "@/components/ForumPost";
 
 Vue.use(VueRouter)
 
@@ -23,6 +24,18 @@ const routes = [
     path: '/auth',
     name: 'Auth',
     component: Auth
+  },
+  {
+    path: '/posts/:post_id',
+    name: 'ForumPost',
+    component: ForumPost,
+    // beforeEnter(to, from, next){
+    //   if (store.getters.isAuthenticated) {
+    //     next()
+    //   }else {
+    //     next('/auth')
+    //   }
+    // }
   },
   {
     path: '/about',
