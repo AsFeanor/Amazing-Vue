@@ -14,7 +14,6 @@
               </div>
               <form>
                 <div class="form-group" @submit.prevent="submitForm">
-                  <input v-model="userName" type="text" >
                   <label for="title">Title</label>
                   <input v-model="postTitle" class="form-control" id="title" type="text" placeholder="Title">
                   <label for="content">Content</label>
@@ -22,7 +21,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button @click="submitForm" type="submit" class="btn btn-primary">Save changes</button>
+                  <button @click="submitForm" type="submit" class="btn btn-success">Save changes</button>
                 </div>
               </form>
             </div>
@@ -42,10 +41,10 @@
             </div>
           </div>
         </div>
-        <div class="card-body py-3" v-for="post in posts" :key="post.post_id">
+        <div class="card-body py-3" v-for="post in sortedPosts" :key="post.post_id">
           <div class="row no-gutters align-items-center">
-            <div class="col"><router-link to="`/posts/${post.post_id}`" class="text-big" data-abc="true">{{ post.title }}</router-link>
-              <div class="text-muted small mt-1">Started 25 days ago &nbsp;·&nbsp; <a href="javascript:void(0)" class="text-muted" data-abc="true">{{ post.user_name }}</a></div>
+            <div class="col"><router-link :to="`post/${post.post_id}`" class="text-big" data-abc="true">{{ post.title }}</router-link>
+              <div class="text-muted small mt-1">{{ frontEndFormat(post.date) }} &nbsp;·&nbsp; <a href="javascript:void(0)" class="text-muted" data-abc="true">{{ post.user_name }}</a></div>
             </div>
             <div class="d-none d-md-block col-4">
               <div class="row no-gutters align-items-center">
@@ -67,6 +66,8 @@
 
 <script>
 import axios from "axios";
+import dayjs from 'dayjs';
+
 
 export default {
 name: "Forums",
@@ -75,6 +76,7 @@ name: "Forums",
     posts: [],
     postTitle: "",
     postContent: "",
+    date: new (Date)
   }
   },
   mounted() {
@@ -90,9 +92,9 @@ name: "Forums",
     submitForm() {
       const titleIsValid = !!this.postTitle;
       const contentIsValid = !!this.postContent;
-      const formIsValid = titleIsValid && contentIsValid && userName;
+      const formIsValid = titleIsValid && contentIsValid;
       if (formIsValid) {
-        axios.post('http://localhost:3000/posts', { title: this.postTitle, content: this.postContent })
+        axios.post('http://localhost:3000/posts', { title: this.postTitle, content: this.postContent, user_name: this.userName, date: this.date})
             .then((response) => {
               console.log(response);
             })
@@ -100,6 +102,18 @@ name: "Forums",
       }else {
         console.log('Invalid')
       }
+    },
+    frontEndFormat (date) {
+      const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
+      return formatDate;
+    }
+  },
+  computed: {
+    userName() {
+      return this.$store.state.name
+    },
+    sortedPosts() {
+      return this.posts.slice().sort((a, b) => b.date - a.date)
     }
   }
 }

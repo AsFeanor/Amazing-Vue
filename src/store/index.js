@@ -8,6 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     jwtToken : "",
+    name: "",
   },
   mutations: {
     setToken(state, jwtToken) {
@@ -15,16 +16,24 @@ export default new Vuex.Store({
     },
     clearToken(state) {
       state.jwtToken = ""
+    },
+    setName(state, name) {
+      state.name = name
+    },
+    clearName(state) {
+      state.name = ""
     }
   },
   actions: {
     initAuth({ dispatch, commit }) {
       let jwtToken = localStorage.getItem('jwtToken');
-      if (jwtToken) {
+      let name = localStorage.getItem('name');
+      if (jwtToken && name) {
         commit('setToken', jwtToken);
-        router.push('/');
+        commit('setName', name);
+        // router.push('/');
       }else {
-        router.push('/auth');
+        router.push('/auth').catch(()=>{});
         return false;
       }
     },
@@ -38,15 +47,18 @@ export default new Vuex.Store({
           .then((response) => {
             console.log(response.data);
             commit('setToken', response.data.jwtToken);
+            commit('setName', response.data.user.rows[0].name);
             localStorage.setItem('jwtToken', response.data.jwtToken);
+            localStorage.setItem('name', response.data.user.rows[0].name);
 
             // dispatch('setTimeoutTimer', +response.data.expiresIn)
           })
           .catch((e) => console.log(e));
     },
     logout({ commit }) {
-      commit('clearToken');
+      commit('clearToken','clearName');
       localStorage.removeItem('jwtToken');
+      localStorage.removeItem('name');
       router.replace('/auth');
     },
     // setTimeoutTimer({ dispatch }, expiresIn) {

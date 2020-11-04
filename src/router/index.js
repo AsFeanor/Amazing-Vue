@@ -26,7 +26,7 @@ const routes = [
     component: Auth
   },
   {
-    path: '/posts/:post_id',
+    path: '/post/:post_id',
     name: 'ForumPost',
     component: ForumPost,
     // beforeEnter(to, from, next){

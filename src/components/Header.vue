@@ -8,7 +8,7 @@
       </ul>
       <ul class="navbar-nav my-2 my-lg-0" :class="logoutClass">
         <li class="nav-item">
-          <a @click.prevent="logout" class="nav-link" href="#">Çıkış Yap</a>
+          <a @click.prevent="logout" class="nav-link" href="#">Logout</a>
         </li>
       </ul>
     </div>
@@ -27,6 +27,6 @@ export default {
         'd-none': !this.$store.getters.isAuthenticated
       }
     }
-  }
+  },
 }
 </script>

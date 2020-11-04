@@ -1,52 +1,131 @@
 <template>
-  <div class="container-fluid mt-100" >
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card mb-4">
-          <div class="card-header">
-            <div class="media flex-wrap w-100 align-items-center"> <img src="https://res.cloudinary.com/dxfq3iotg/image/upload/v1574583246/AAA/2.jpg" class="d-block ui-w-40 rounded-circle" alt="">
-              <div class="media-body ml-3"> <a href="javascript:void(0)" data-abc="true">Tom Harry</a>
-                <div class="text-muted small">13 days ago</div>
-              </div>
-              <div class="text-muted small ml-3">
-                <div>Member since <strong>01/1/2019</strong></div>
-                <div><strong>134</strong> posts</div>
+  <div>
+    <div class="container-fluid mt-100" >
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card mb-4">
+            <div class="card-header">
+              <div class="media flex-wrap w-100 align-items-center"> <img src="https://res.cloudinary.com/dxfq3iotg/image/upload/v1574583246/AAA/2.jpg" class="d-block ui-w-40 rounded-circle" alt="">
+                <div class="media-body ml-3"> <a href="javascript:void(0)" data-abc="true">{{ posts.user_name }}</a>
+                  <div class="text-muted small">{{ frontEndFormat(posts.date) }}</div>
+                </div>
+                <div class="text-muted small ml-3">
+                  <div>Member since <strong>01/1/2019</strong></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="card-body" v-for="post in getPost" :key="post.post_id">
-            <h4>{{ post.title }}</h4>
-            <p>{{ post.content }}</p>
-          </div>
-          <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
-            <div class="px-4 pt-3"> <a href="javascript:void(0)" class="text-muted d-inline-flex align-items-center align-middle" data-abc="true"> <i class="fa fa-heart text-danger"></i>&nbsp; <span class="align-middle">445</span> </a> <span class="text-muted d-inline-flex align-items-center align-middle ml-4"> <i class="fa fa-eye text-muted fsize-3"></i>&nbsp; <span class="align-middle">14532</span> </span> </div>
-            <div class="px-4 pt-3"> <button type="button" class="btn btn-primary"><i class="ion ion-md-create"></i>&nbsp; Reply</button> </div>
+            <div class="card-body">
+              <p>{{ posts.content }}</p>
+            </div>
+            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
+              <div class="px-4 pt-3"> <a href="javascript:void(0)" class="text-muted d-inline-flex align-items-center align-middle" data-abc="true"> <i class="fa fa-heart text-danger"></i>&nbsp; <span class="align-middle">445</span> </a> <span class="text-muted d-inline-flex align-items-center align-middle ml-4"> <i class="fa fa-eye text-muted fsize-3"></i>&nbsp; <span class="align-middle">14532</span> </span> </div>
+              <div class="px-4 pt-3"> <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newReply"><i class="ion ion-md-create"></i>&nbsp; Reply</button> </div>
+              <div class="modal fade" id="newReply" tabindex="-1" role="form" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="form">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Make a Reply</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <form>
+                      <div class="form-group" @submit.prevent="submitReply">
+                        <label for="content">Content</label>
+                        <textarea v-model="replyContent" class="form-control" id="content" rows="5"></textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button @click="submitReply" type="submit" class="btn btn-success">Save changes</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <template v-for="reply in replies">
+      <div class="container-fluid mt-100" :key="reply.reply_id">
+        <div class="row" >
+          <div class="col-md-12" >
+            <div class="card mb-4">
+              <div class="card-header">
+                <div class="media flex-wrap w-100 align-items-center"> <img src="https://res.cloudinary.com/dxfq3iotg/image/upload/v1574583246/AAA/2.jpg" class="d-block ui-w-40 rounded-circle" alt="">
+                  <div class="media-body ml-3"> <a href="javascript:void(0)" data-abc="true">{{ reply.user_name }}</a>
+                    <div class="text-muted small">{{ frontEndFormat(reply.date) }}</div>
+                  </div>
+                  <div class="text-muted small ml-3">
+                    <div>Member since <strong>01/1/2019</strong></div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <p>{{ reply.content }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import dayjs from "dayjs";
+
 
 export default {
 name: "ForumPost",
+
   data() {
     return {
-      posts: []
+      posts: [],
+      replies: [],
+      date: new (Date),
+      replyContent: "",
+      selectedRoute: this.$route.params.post_id,
     }
   },
-  computed: {
-    getPost(post_id) {
-      axios.get(`http://localhost:3000/posts/${post_id}`)
+    created() {
+      axios.get(`http://localhost:3000/posts/` + this.selectedRoute)
           .then((response) => {
+            this.posts = response.data;
             console.log(response);
           })
           .catch((e) => {
             this.posts = console.log(e);
           });
+    },
+  mounted() {
+    axios.get(`http://localhost:3000/posts/` + this.selectedRoute + '/replies')
+        .then((response) => {
+          this.replies = response.data;
+          console.log(response);
+        })
+        .catch((e) => {
+          this.replies = console.log(e);
+        });
+  },
+  methods: {
+    submitReply() {
+        axios.post(`http://localhost:3000/posts/` + this.selectedRoute + '/replies', {content: this.replyContent, post_id: this.selectedRoute, user_name: this.userName, date: this.date})
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((e) => console.log(e));
+    },
+    frontEndFormat (date) {
+      const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
+      return formatDate;
+    }
+  },
+  computed: {
+    userName() {
+      return this.$store.state.name
     }
   }
 }
