@@ -10,7 +10,7 @@
                   <div class="text-muted small">{{ frontEndFormat(posts.date) }}</div>
                 </div>
                 <div class="text-muted small ml-3">
-                  <div>Member since <strong>01/1/2019</strong></div>
+                  <div>Member since <strong>{{ memberTimeFormat(posts.member_since) }}</strong></div>
                 </div>
               </div>
             </div>
@@ -58,7 +58,7 @@
                     <div class="text-muted small">{{ frontEndFormat(reply.date) }}</div>
                   </div>
                   <div class="text-muted small ml-3">
-                    <div>Member since <strong>01/1/2019</strong></div>
+                    <div>Member since <strong>{{ memberTimeFormat(reply.member_since) }}</strong></div>
                   </div>
                 </div>
               </div>
@@ -112,21 +112,29 @@ name: "ForumPost",
   },
   methods: {
     submitReply() {
-        axios.post(`http://localhost:3000/posts/` + this.selectedRoute + '/replies', {content: this.replyContent, post_id: this.selectedRoute, user_name: this.userName, date: this.date})
+        axios.post(`http://localhost:3000/posts/` + this.selectedRoute + '/replies', {content: this.replyContent, post_id: this.selectedRoute, user_name: this.userName, date: this.date, member_since: this.memberSince})
             .then((response) => {
               console.log(response);
+              alert('Your Reply Was Successfully Added.')
             })
             .catch((e) => console.log(e));
     },
     frontEndFormat (date) {
       const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
       return formatDate;
+    },
+    memberTimeFormat (date) {
+      const formatDate = dayjs(date).format('DD/MM/YYYY')
+      return formatDate;
     }
   },
   computed: {
     userName() {
       return this.$store.state.name
-    }
+    },
+    memberSince() {
+      return this.$store.state.member_since
+    },
   }
 }
 </script>

@@ -39,6 +39,8 @@
 
 <script>
 
+import dayjs from "dayjs";
+
 export default {
   name: "Auth",
   data() {
@@ -46,19 +48,25 @@ export default {
       user: {
         name: null,
         email: null,
-        password: null
+        password: null,
       },
       isUser: false
     }
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch("login", { ...this.user, isUser: this.isUser })
+      this.$store.dispatch("login", { ...this.user, isUser: this.isUser})
       .then(response => {
         this.$router.push("/")
       })
     }
-  }
+  },
+  // computed: {
+  //   backEndFormat(date) {
+  //     const formatDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss')
+  //     return formatDate;
+  //   }
+  // }
 }
 </script>
 

@@ -9,6 +9,7 @@ export default new Vuex.Store({
   state: {
     jwtToken : "",
     name: "",
+    member_since: {}
   },
   mutations: {
     setToken(state, jwtToken) {
@@ -22,16 +23,24 @@ export default new Vuex.Store({
     },
     clearName(state) {
       state.name = ""
-    }
+    },
+    setMemberSince(state, member_since) {
+      state.member_since = member_since
+    },
+    clearMemberSince(state) {
+      state.member_since = ""
+    },
   },
   actions: {
     initAuth({ dispatch, commit }) {
       let jwtToken = localStorage.getItem('jwtToken');
       let name = localStorage.getItem('name');
-      if (jwtToken && name) {
+      let member_since = localStorage.getItem('member_since');
+      if (jwtToken && name && member_since) {
         commit('setToken', jwtToken);
         commit('setName', name);
-        // router.push('/');
+        commit('setMemberSince', member_since);
+        router.push('/').catch(()=>{});
       }else {
         router.push('/auth').catch(()=>{});
         return false;
@@ -48,17 +57,20 @@ export default new Vuex.Store({
             console.log(response.data);
             commit('setToken', response.data.jwtToken);
             commit('setName', response.data.user.rows[0].name);
+            commit('setMemberSince', response.data.member_since[0].member_since);
             localStorage.setItem('jwtToken', response.data.jwtToken);
             localStorage.setItem('name', response.data.user.rows[0].name);
+            localStorage.setItem('member_since', response.data.member_since[0].member_since);
 
             // dispatch('setTimeoutTimer', +response.data.expiresIn)
           })
           .catch((e) => console.log(e));
     },
     logout({ commit }) {
-      commit('clearToken','clearName');
+      commit('clearToken','clearName','clearMemberSince');
       localStorage.removeItem('jwtToken');
       localStorage.removeItem('name');
+      localStorage.removeItem('member_since');
       router.replace('/auth');
     },
     // setTimeoutTimer({ dispatch }, expiresIn) {

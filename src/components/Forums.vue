@@ -41,7 +41,7 @@
             </div>
           </div>
         </div>
-        <div class="card-body py-3" v-for="post in sortedPosts" :key="post.post_id">
+        <div class="card-body py-3" v-for="post in posts" :key="post.post_id">
           <div class="row no-gutters align-items-center">
             <div class="col"><router-link :to="`post/${post.post_id}`" class="text-big" data-abc="true">{{ post.title }}</router-link>
               <div class="text-muted small mt-1">{{ frontEndFormat(post.date) }} &nbsp;·&nbsp; <a href="javascript:void(0)" class="text-muted" data-abc="true">{{ post.user_name }}</a></div>
@@ -76,7 +76,7 @@ name: "Forums",
     posts: [],
     postTitle: "",
     postContent: "",
-    date: new (Date)
+    date: new Date()
   }
   },
   mounted() {
@@ -94,9 +94,10 @@ name: "Forums",
       const contentIsValid = !!this.postContent;
       const formIsValid = titleIsValid && contentIsValid;
       if (formIsValid) {
-        axios.post('http://localhost:3000/posts', { title: this.postTitle, content: this.postContent, user_name: this.userName, date: this.date})
+        axios.post('http://localhost:3000/posts', { title: this.postTitle, content: this.postContent, user_name: this.userName, date: this.date, member_since: this.memberSince})
             .then((response) => {
               console.log(response);
+              alert('Your Forum Was Successfully Created.')
             })
             .catch((e) => console.log(e));
       }else {
@@ -106,15 +107,18 @@ name: "Forums",
     frontEndFormat (date) {
       const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
       return formatDate;
-    }
+    },
   },
   computed: {
     userName() {
       return this.$store.state.name
     },
-    sortedPosts() {
-      return this.posts.slice().sort((a, b) => b.date - a.date)
-    }
+    memberSince() {
+      return this.$store.state.member_since
+    },
+    // sortedPosts() {
+    //   return this.posts.slice().sort((a, b) => b.date - a.date)
+    // }
   }
 }
 

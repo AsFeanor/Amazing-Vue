@@ -9,6 +9,9 @@ props: ['reply'],
   computed: {
     userName() {
       return this.$store.state.name
+    },
+    memberSince() {
+      return this.$store.state.member_since
     }
   }
 }
