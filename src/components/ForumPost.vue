@@ -36,7 +36,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button @click="submitReply" type="submit" class="btn btn-success">Save changes</button>
+                        <button @click.prevent="replyDelay" type="submit" class="btn btn-success">Save changes</button>
                       </div>
                     </form>
                   </div>
@@ -115,9 +115,18 @@ name: "ForumPost",
         axios.post(`http://localhost:3000/posts/` + this.selectedRoute + '/replies', {content: this.replyContent, post_id: this.selectedRoute, user_name: this.userName, date: this.date, member_since: this.memberSince})
             .then((response) => {
               console.log(response);
-              alert('Your Reply Was Successfully Added.')
             })
             .catch((e) => console.log(e));
+    },
+    replyDelay(){
+      this.$toast.success({
+        title:'Posted Successfully',
+        message:'Your reply has been successfully added.'
+      })
+      setTimeout(() => {
+        this.submitReply()
+        this.$router.go('/post/:post_id')
+      },4000)
     },
     frontEndFormat (date) {
       const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')

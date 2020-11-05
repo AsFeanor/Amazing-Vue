@@ -38,9 +38,6 @@
 </template>
 
 <script>
-
-import dayjs from "dayjs";
-
 export default {
   name: "Auth",
   data() {
@@ -57,7 +54,11 @@ export default {
     onSubmit() {
       this.$store.dispatch("login", { ...this.user, isUser: this.isUser})
       .then(response => {
-        this.$router.push("/")
+        this.$toast.success({
+          title:'Authorization Completed',
+          message:'You have logged in'
+        })
+        this.$router.push('/')
       })
     }
   },

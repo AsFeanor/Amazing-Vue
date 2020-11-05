@@ -23,19 +23,19 @@ const routes = [
   {
     path: '/auth',
     name: 'Auth',
-    component: Auth
+    component: Auth,
   },
   {
     path: '/post/:post_id',
     name: 'ForumPost',
     component: ForumPost,
-    // beforeEnter(to, from, next){
-    //   if (store.getters.isAuthenticated) {
-    //     next()
-    //   }else {
-    //     next('/auth')
-    //   }
-    // }
+    beforeEnter(to, from, next){
+      if (store.getters.isAuthenticated) {
+        next()
+      }else {
+        next('/auth')
+      }
+    }
   },
   {
     path: '/about',

@@ -14,14 +14,14 @@
               </div>
               <form>
                 <div class="form-group" @submit.prevent="submitForm">
-                  <label for="title">Title</label>
-                  <input v-model="postTitle" class="form-control" id="title" type="text" placeholder="Title">
-                  <label for="content">Content</label>
+                  <label class="modal-label text-muted" for="title">Title</label>
+                  <input v-model="postTitle" class="form-control" id="title" type="text">
+                  <label class="modal-label text-muted" for="content">Content</label>
                   <textarea v-model="postContent" class="form-control" id="content" rows="5"></textarea>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button @click="submitForm" type="submit" class="btn btn-success">Save changes</button>
+                  <button @click.prevent="submitDelay" type="submit" class="btn btn-success">Save changes</button>
                 </div>
               </form>
             </div>
@@ -67,6 +67,7 @@
 <script>
 import axios from "axios";
 import dayjs from 'dayjs';
+import router from "@/router";
 
 
 export default {
@@ -76,7 +77,7 @@ name: "Forums",
     posts: [],
     postTitle: "",
     postContent: "",
-    date: new Date()
+    date: new Date(),
   }
   },
   mounted() {
@@ -93,16 +94,32 @@ name: "Forums",
       const titleIsValid = !!this.postTitle;
       const contentIsValid = !!this.postContent;
       const formIsValid = titleIsValid && contentIsValid;
-      if (formIsValid) {
-        axios.post('http://localhost:3000/posts', { title: this.postTitle, content: this.postContent, user_name: this.userName, date: this.date, member_since: this.memberSince})
-            .then((response) => {
-              console.log(response);
-              alert('Your Forum Was Successfully Created.')
-            })
-            .catch((e) => console.log(e));
-      }else {
+        if (formIsValid) {
+          axios.post('http://localhost:3000/posts', {
+            title: this.postTitle,
+            content: this.postContent,
+            user_name: this.userName,
+            date: this.date,
+            member_since: this.memberSince
+          })
+              .then((response) => {
+                console.log(response);
+              })
+              .catch((e) => console.log(e));
+        }
+      else {
         console.log('Invalid')
       }
+    },
+    submitDelay() {
+      this.$toast.success({
+        title:'Posted Successfully',
+        message:'Your post has been successfully added.'
+      })
+      setTimeout(() => {
+        this.submitForm()
+        this.$router.go(0)
+      },4000)
     },
     frontEndFormat (date) {
       const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
@@ -177,6 +194,14 @@ body {
 .btn-success {
   color: #fff;
 
+}
+
+.modal-label {
+  padding-left: 18px;
+  padding-top: 5px;
+  margin-bottom: 2px !important;
+  margin-left: 2px !important;
+  font-weight: bold;
 }
 
 .form-control {

@@ -21,6 +21,6 @@ export default {
 }
 </script>
 
-<style>
+<style src="cxlt-vue2-toastr/dist/css/cxlt-vue2-toastr.css">
 
 </style>
