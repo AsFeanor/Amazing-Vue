@@ -27,7 +27,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-3 p-0 mb-3"> <input type="text" class="form-control" placeholder="Search..."> </div>
+        <div class="col-12 col-md-3 p-0 mb-3"> <input type="text" class="form-control" v-model="search" placeholder="Search..."> </div>
       </div>
       <div class="card mb-3">
         <div class="card-header pl-0 pr-0">
@@ -41,7 +41,7 @@
             </div>
           </div>
         </div>
-        <div class="card-body py-3" v-for="post in posts" :key="post.post_id">
+        <div class="card-body py-3" v-for="post in filteredAndSortedPosts" :key="post.post_id">
           <div class="row no-gutters align-items-center">
             <div class="col"><router-link :to="`post/${post.post_id}`" class="text-big" data-abc="true">{{ post.title }}</router-link>
               <div class="text-muted small mt-1">{{ frontEndFormat(post.date) }} &nbsp;·&nbsp; <a href="javascript:void(0)" class="text-muted" data-abc="true">{{ post.user_name }}</a></div>
@@ -77,6 +77,7 @@ name: "Forums",
     posts: [],
     postTitle: "",
     postContent: "",
+    search: '',
     date: new Date(),
   }
   },
@@ -91,10 +92,6 @@ name: "Forums",
   },
   methods:{
     submitForm() {
-      const titleIsValid = !!this.postTitle;
-      const contentIsValid = !!this.postContent;
-      const formIsValid = titleIsValid && contentIsValid;
-        if (formIsValid) {
           axios.post('http://localhost:3000/posts', {
             title: this.postTitle,
             content: this.postContent,
@@ -106,20 +103,28 @@ name: "Forums",
                 console.log(response);
               })
               .catch((e) => console.log(e));
-        }
-      else {
-        console.log('Invalid')
-      }
     },
     submitDelay() {
-      this.$toast.success({
-        title:'Posted Successfully',
-        message:'Your post has been successfully added.'
-      })
-      setTimeout(() => {
-        this.submitForm()
-        this.$router.go(0)
-      },4000)
+      const titleIsValid = !!this.postTitle;
+      const contentIsValid = !!this.postContent;
+      const formIsValid = titleIsValid && contentIsValid;
+      if (formIsValid) {
+        this.$toast.success({
+          title: 'Posted Successfully',
+          message: 'Your post has been successfully added'
+        })
+        setTimeout(() => {
+          this.submitForm()
+          this.$router.go(0)
+        }, 4000)
+      } else
+        {
+          this.$toast.error({
+            title: 'Posted Failed',
+            message: 'Please Fill All the Blanks'
+          })
+          console.log('Invalid')
+        }
     },
     frontEndFormat (date) {
       const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
@@ -133,9 +138,20 @@ name: "Forums",
     memberSince() {
       return this.$store.state.member_since
     },
-    // sortedPosts() {
-    //   return this.posts.slice().sort((a, b) => b.date - a.date)
-    // }
+    filteredAndSortedPosts() {
+      function compare(a, b) {
+        if (a.date < b.date)
+          return 1;
+        if (a.date > b.date)
+          return -1;
+        return 0;
+      }
+      const sortPosts = this.posts.sort(compare);
+
+      const filterPosts = this.posts.filter(({ title }) => title.match(this.search));
+
+      return sortPosts,filterPosts
+    },
   }
 }
 

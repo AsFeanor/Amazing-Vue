@@ -47,7 +47,7 @@
         </div>
       </div>
     </div>
-    <template v-for="reply in replies">
+    <template v-for="reply in sortedReplies">
       <div class="container-fluid mt-100" :key="reply.reply_id">
         <div class="row" >
           <div class="col-md-12" >
@@ -112,21 +112,36 @@ name: "ForumPost",
   },
   methods: {
     submitReply() {
-        axios.post(`http://localhost:3000/posts/` + this.selectedRoute + '/replies', {content: this.replyContent, post_id: this.selectedRoute, user_name: this.userName, date: this.date, member_since: this.memberSince})
+        axios.post(`http://localhost:3000/posts/` + this.selectedRoute + '/replies', {
+          content: this.replyContent,
+          post_id: this.selectedRoute,
+          user_name: this.userName,
+          date: this.date,
+          member_since: this.memberSince
+        })
             .then((response) => {
               console.log(response);
             })
             .catch((e) => console.log(e));
     },
     replyDelay(){
-      this.$toast.success({
-        title:'Posted Successfully',
-        message:'Your reply has been successfully added.'
-      })
-      setTimeout(() => {
-        this.submitReply()
-        this.$router.go('/post/:post_id')
-      },4000)
+      const contentIsValid = !!this.replyContent
+      if (contentIsValid) {
+        this.$toast.success({
+          title: 'Posted Successfully',
+          message: 'Your reply has been successfully added'
+        })
+        setTimeout(() => {
+          this.submitReply()
+          this.$router.go('/post/:post_id')
+        }, 4000)
+      }else {
+        this.$toast.error({
+          title: 'Posted Failed',
+          message: 'Please Write a Reply'
+        })
+        console.log('Invalid');
+      }
     },
     frontEndFormat (date) {
       const formatDate = dayjs(date).format('YYYY/MM/DD HH:mm')
@@ -144,6 +159,16 @@ name: "ForumPost",
     memberSince() {
       return this.$store.state.member_since
     },
+    sortedReplies() {
+      function compare(a, b) {
+        if (a.date < b.date)
+          return -1;
+        if (a.date > b.date)
+          return 1;
+        return 0;
+      }
+      return this.replies.sort(compare);
+    }
   }
 }
 </script>

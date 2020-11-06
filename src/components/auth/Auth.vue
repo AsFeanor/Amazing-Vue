@@ -52,16 +52,23 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$store.dispatch("login", { ...this.user, isUser: this.isUser})
-      .then(response => {
-        this.$toast.success({
-          title:'Authorization Completed',
-          message:'You have logged in'
-        })
-        this.$router.push('/')
-      })
-    }
-  },
+        this.$store.dispatch("login", {...this.user, isUser: this.isUser})
+            .then(response => {
+              if (this.$store.getters.isAuthenticated){
+                this.$toast.success({
+                  title: 'Authorization Completed',
+                  message: 'You have logged in'
+                })
+              }else {
+                this.$toast.error({
+                  title: 'Authorization Denied',
+                  message: 'Please check your user information'
+                })
+              }
+              this.$router.push('/')
+            })
+      }
+    },
   // computed: {
   //   backEndFormat(date) {
   //     const formatDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss')
